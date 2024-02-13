@@ -195,6 +195,7 @@ public:
         if (postfix.empty()) {
             throw "No expression provided.";
         }
+
         for (int i = 0; i < postfix.length(); ++i) {
             if (isdigit(postfix[i])) {
                 std::string operand;
