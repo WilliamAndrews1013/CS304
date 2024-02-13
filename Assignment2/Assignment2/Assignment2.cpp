@@ -5,30 +5,30 @@
 #include <string>
 
 template<typename T>
-class Stack {
+class Vector {
     T* elem;
     int sz;
     int capacity;
 
 public:
-    Stack(int initialSize = 0) : elem{ new T[initialSize] }, sz{ 0 }, capacity{ initialSize } {}
+    Vector(int initialSize = 0) : elem{ new T[initialSize] }, sz{ 0 }, capacity{ initialSize } {}
 
-    ~Stack() { delete[] elem; }
+    ~Vector() { delete[] elem; }
 
-    Stack(const Stack& v) : elem{ new T[v.sz] }, sz{ v.sz }, capacity{ v.sz }
+    Vector(const Vector& v) : elem{ new T[v.sz] }, sz{ v.sz }, capacity{ v.sz }
     {
         for (int i = 0; i < sz; ++i)
             elem[i] = v.elem[i];
     }
 
-    Stack(Stack&& rhs) : elem{ rhs.elem }, sz{ rhs.sz }, capacity{ rhs.sz }
+    Vector(Vector&& rhs) : elem{ rhs.elem }, sz{ rhs.sz }, capacity{ rhs.sz }
     {
         rhs.elem = nullptr;
         rhs.sz = 0;
         rhs.capacity = 0;
     }
 
-    Stack& operator=(const Stack& v)
+    Vector& operator=(const Vector& v)
     {
         T* p = new T[v.sz];
         for (int i = 0; i != v.sz; ++i)
@@ -43,7 +43,7 @@ public:
         return *this;
     }
 
-    Stack& operator=(const Stack&& rhs)
+    Vector& operator=(const Vector&& rhs)
     {
         if (this != &rhs)
         {
@@ -92,20 +92,6 @@ public:
         return sz == 0;
     }
 
-    void push(const T& value) {
-        if (sz == capacity) {
-            int additionalSpace = (capacity == 0) ? 1 : 2 * capacity;
-            T* newArray = new T[additionalSpace];
-            for (int i = 0; i < sz; ++i)
-                newArray[i] = elem[i];
-            delete[] elem;
-            elem = newArray;
-            capacity = additionalSpace;
-        }
-        elem[sz] = value;
-        ++sz;
-    }
-
     void pop() {
         if (!empty()) {
             --sz;
@@ -124,6 +110,17 @@ public:
             exit(EXIT_FAILURE);
         }
     }
+};
+
+template<typename T>
+class Stack {
+    Vector<T> elems;
+
+public:
+    T top() { return elems.top(); }
+    void push(T elem) { return elems.push_back(elem); }
+    void pop() { elems.pop(); }
+    bool isEmpty() { return elems.empty(); }
 };
 
 
@@ -171,7 +168,7 @@ public:
                 _postfix += " ";
             }
             else if (isOperator(i)) {
-                while (!operatorStack.empty() && getPriotity(operatorStack.top()) >= getPriotity(i)) {
+                while (!operatorStack.isEmpty() && getPriotity(operatorStack.top()) >= getPriotity(i)) {
                     _postfix += operatorStack.top();
                     _postfix += " ";
                     operatorStack.pop();
@@ -180,7 +177,7 @@ public:
             }
         }
 
-        while (!operatorStack.empty()) {
+        while (!operatorStack.isEmpty()) {
             _postfix += operatorStack.top();
             _postfix += " ";
             operatorStack.pop();
@@ -213,7 +210,7 @@ public:
                     std::string operand1 = operandStack.top();
                     operandStack.pop();
 
-                    if (operandStack.empty()) {
+                    if (operandStack.isEmpty()) {
                         throw "Invalid expression. Try adding a space between operands";
                     }
                     else {
@@ -279,6 +276,7 @@ public:
     }
 };
 
+// Prints out the menu screen
 void menu() {
     std::cout << std::endl;
     std::cout << "Select an option:" << std::endl;
@@ -289,12 +287,14 @@ void menu() {
     std::cout << "Enter Choice: ";
 }
 
+// Quit the program
 void quit() {
     std::cout << std::endl;
     std::cout << "Goodbye!" << std::endl;
     exit(0);
 }
 
+// Checks if the choice is valid
 bool isValidChoice(int choice) {
     if (choice < 1 || choice > 5 || std::cin.fail()) {
         std::cout << std::endl;
@@ -308,12 +308,15 @@ bool isValidChoice(int choice) {
     return true;
 }
 
+// This function handles the user input and calls the proper funciton based on the expression entered
 void handleInput(const std::string& input, int choice) {
     int direction;
 
     if (choice == 1)
         direction = 1;
     else if (choice == 2)
+        direction = 2;
+    else if (choice == 3)
         direction = 2;
     else
         direction = 0;
@@ -333,6 +336,7 @@ void handleInput(const std::string& input, int choice) {
             break;
         case 5:
             std::cout << "GoodBye!" << std::endl;
+            break;
         default:
             std::cout << "Invalid choice" << std::endl;
             break;
@@ -353,8 +357,18 @@ int main()
             break;
     }
 
-    std::cout << "Enter an expression: ";
-    //std::cin >> input;
+    if (choice == 1) {
+        std::cout << "Enter expression in this format: 2+2" << std::endl;
+        std::cout << "Enter an expression: ";
+    }
+    else if (choice == 2) {
+        std::cout << "Enter expression in this format: 2 2 +. Make sure to add a space after every operator and number" << std::endl;
+        std::cout << "Enter an expression: ";
+    }
+    else if (choice == 3)
+        std::cout << "Enter expression in this format: 2 2 +. Make sure to add a space after every operator and number" << std::endl;
+        std::cout << "Enter an expression: ";
+
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::getline(std::cin, input);
 
