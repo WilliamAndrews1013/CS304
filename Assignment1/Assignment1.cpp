@@ -60,23 +60,27 @@ class Vector {
     int capacity;
 
 public:
+    // Deconstructor
     Vector(int s) : elem{ new T[s] }, sz{ s }, capacity{ s } {}
     
     ~Vector() { delete[] elem; }
 
+    // Copy Constructor
     Vector(const Vector& v) : elem{ new T[v.sz] }, sz{ v.sz }, capacity{ v.sz }
     {
         for (int i = 0; i < sz; ++i)
             elem[i] = v.elem[i];
     }
 
-    Vector(Vector&& rhs) : elem{ rhs.elem }, sz{ rhs.sz }, capacity{ rhs.sz }
+    // Move Constructor
+    Vector(Vector& rhs) : elem{ rhs.elem }, sz{ rhs.sz }, capacity{ rhs.sz }
     {
         rhs.elem = nullptr;
         rhs.sz = 0;
         rhs.capacity = 0;
     }
 
+    // Copy Assignment
     Vector& operator=(const Vector& v)
     {
         T* p = new T[v.sz];
@@ -92,6 +96,7 @@ public:
         return *this;
     }
 
+    // Move Assignment
     Vector& operator=(const Vector&& rhs)
     {
         if (this != &rhs)
