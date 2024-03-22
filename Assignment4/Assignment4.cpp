@@ -23,16 +23,6 @@ class ExpressionTree {
 public:
     ExpressionTree() : root(nullptr) {}
 
-    TreeNode* getRoot() { return root; }
-
-    void setRoot(char elem)
-    {
-        if (root == nullptr)
-            root = new TreeNode(elem);
-        else
-            std::cout << "Root already exists." << std::endl;
-    }
-
     bool isOperator(char op) 
     {
         if (op == '+' || op == '-' || op == '*' || op == '/' || op == '^')
@@ -40,11 +30,11 @@ public:
         return false;
     }
 
-    TreeNode* buildTree(std::string expression) 
+    TreeNode* buildTree(const std::string& expression) 
     {
         std::stack<TreeNode*> stack;
         TreeNode* t, * t1, * t2;
-        for (int c = 0; expression.size(); ++c) {
+        for (int c = 0; c < expression.size(); ++c) {
             if (c == '(') {
 
             }
@@ -63,8 +53,8 @@ public:
                 t2 = stack.top();
                 stack.pop();
 
-                t->firstChild = t1;
-                t->nextSibling = t2;
+                t->firstChild = t2;
+                t->nextSibling = t1;
 
                 stack.push(t);
             }
@@ -76,28 +66,79 @@ public:
         return root;
     }
 
+    void printPostfix(TreeNode* n)
+    {
+        if (n != nullptr) {
+            printPostfix(n->firstChild);
+            printPostfix(n->nextSibling);
+            std::cout << (n->element) << " ";
+        }
+    }
+
+    void printInfix(TreeNode* n)
+    {
+        if (n != nullptr) {
+            printInfix(n->firstChild);
+            std::cout << (n->element) << " ";
+            printInfix(n->nextSibling);
+        }
+    }
+
+    void printPrefix(TreeNode* n)
+    {
+        if (n != nullptr) {
+            std::cout << n->element << " ";
+            printPrefix(n->firstChild);
+            printPrefix(n->nextSibling);
+        }
+    }
+
+    int evaluate(TreeNode* n) 
+    {
+        if (n == nullptr)
+            return 0;
+
+        if (n->firstChild == nullptr && n->nextSibling == nullptr)
+            return n->element - '0';
+
+        int left = evaluate(n->firstChild);
+        int right = evaluate(n->nextSibling);
+
+        switch (n->element) {
+        case '+': return left + right;
+        case '-': return left - right;
+        case '*': return left * right;
+        case '/': return left / right;
+        }
+
+        return 0;
+    }
     
 };
 
-void printExpressionTree(TreeNode* root) {
-    if (root == nullptr) return;
-    std::cout << root->element;
-    if (root->firstChild != nullptr) {
-        std::cout << "(";
-        printExpressionTree(root->firstChild);
-        std::cout << ")";
-    }
-    if (root->nextSibling != nullptr) {
-        std::cout << root->nextSibling->element;
-        printExpressionTree(root->nextSibling->nextSibling);
-    }
-}
+class BST {
+    TreeNode* root;
+
+public:
+    BST() : root(nullptr) {}
+
+
+};
 
 int main()
 {
-    std::string expression = "825*+132*+/";
+    std::string expression = "12+34*-";
     ExpressionTree tree;
     TreeNode* root = tree.buildTree(expression);
-    
-    std::cout << root->element << std::endl;
+    tree.printInfix(root);
+    std::cout << std::endl;
+    tree.printPrefix(root);
+    std::cout << std::endl;
+    tree.printPostfix(root);
+    std::cout << std::endl;
+    int result = tree.evaluate(root);
+    std::cout << result << std::endl;
+
+
+
 }
